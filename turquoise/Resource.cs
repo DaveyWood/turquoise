@@ -38,6 +38,10 @@ namespace Turquoise
         {
             Handlers.Add(Tuple.Create(method, AppendBasePath(path), new NoArgumentHandler(handler) as IHandler));            
         }
+        private void MapHandler<T>(string method, string path, Func<T, object> handler)
+        {
+            Handlers.Add(Tuple.Create(method, AppendBasePath(path), new Handler<T>(handler) as IHandler));            
+        }
         
         public void Get(string path, Func<object> handler)
         {
@@ -47,6 +51,17 @@ namespace Turquoise
         public void Get(Func<object> handler)
         {
             Get("", handler);
+        }
+        
+        //TODO: the generics didn't get picked up as cleverly as I had hoped, so I need to rethink this api
+        public void Get2<T>(string path, Func<T, object> handler)
+        {
+            MapHandler("GET", path, handler);
+        }
+        
+        public void Get2<T>(Func<T, object> handler)
+        {
+            Get2("", handler);
         }
     }
 }

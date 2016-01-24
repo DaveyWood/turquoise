@@ -6,7 +6,11 @@ public class FooResource : Resource
         : base("/Foo")
     {
         Get(() => "Hello Foo!");
-        Get("bar", () => "Hello Bar!");
+        Get2<int>("bar", HelloBar);
     }
     
+    private object HelloBar(int a)
+    {
+        return "Hello Bar! a is " + a;
+    }
 }

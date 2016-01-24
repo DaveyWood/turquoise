@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Turquoise.Handlers
 {
@@ -11,7 +12,7 @@ namespace Turquoise.Handlers
             _handler = handler;
         }
         
-        public object HandleRequest(string queryString)
+        public object HandleRequest(IDictionary<string, string[]> queryString)
         {
             return _handler();
         }
