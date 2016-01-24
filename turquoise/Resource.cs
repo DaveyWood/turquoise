@@ -47,14 +47,23 @@ namespace Turquoise
             }
         }
         
-        public void Get(string path, Delegate handler)
+        public void Get(string path, Func<object> handler)
         {
             MapHandler("GET", path, handler);
         }
         
-        public void Get(Delegate handler)
+        public void Get(Func<object> handler)
         {
             Get("", handler);
+        }
+        public void Get<T>(string path, Func<T, object> handler)
+        {
+            MapHandler("GET", path, handler);
+        }
+        
+        public void Get<T>(Func<T, object> handler)
+        {
+            Get<T>("", handler);
         }
         
     }
