@@ -1,12 +1,13 @@
 using Turquoise;
+using System;
 
 public class FooResource : Resource
 {
     public FooResource()
         : base("/Foo")
     {
-        Get(() => "Hello Foo!");
-        Get2<int>("bar", HelloBar);
+        Get((Func<object>)(() => "Hello Foo!"));
+        Get("bar", (Func<int, object>)HelloBar);
     }
     
     private object HelloBar(int a)

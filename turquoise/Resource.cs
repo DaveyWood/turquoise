@@ -34,34 +34,28 @@ namespace Turquoise
             return _basePath + (path ?? "").TrimStart('/');
         }
         
-        private void MapHandler(string method, string path, Func<object> handler)
+        private void MapHandler(string method, string path, Delegate handler)
         {
-            Handlers.Add(Tuple.Create(method, AppendBasePath(path), new NoArgumentHandler(handler) as IHandler));            
-        }
-        private void MapHandler<T>(string method, string path, Func<T, object> handler)
-        {
-            Handlers.Add(Tuple.Create(method, AppendBasePath(path), new Handler<T>(handler) as IHandler));            
+            var parameters = handler.Method.GetParameters();
+            if (0 == parameters.Length)
+            {
+                Handlers.Add(Tuple.Create(method, AppendBasePath(path), new NoArgumentHandler((Func<object>)handler) as IHandler));         
+            }
+            else if (1 == parameters.Length)
+            {
+                Handlers.Add(Tuple.Create(method, AppendBasePath(path), new Handler(handler) as IHandler)); 
+            }
         }
         
-        public void Get(string path, Func<object> handler)
+        public void Get(string path, Delegate handler)
         {
             MapHandler("GET", path, handler);
         }
         
-        public void Get(Func<object> handler)
+        public void Get(Delegate handler)
         {
             Get("", handler);
         }
         
-        //TODO: the generics didn't get picked up as cleverly as I had hoped, so I need to rethink this api
-        public void Get2<T>(string path, Func<T, object> handler)
-        {
-            MapHandler("GET", path, handler);
-        }
-        
-        public void Get2<T>(Func<T, object> handler)
-        {
-            Get2("", handler);
-        }
     }
 }
