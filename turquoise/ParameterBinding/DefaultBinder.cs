@@ -16,10 +16,10 @@ namespace Turquoise.ParameterBinding
         
         public override object Bind(Request request, string parameterName, Type parameterType)
         {
-            var stringValue = request.QueryString.ContainsKey(parameterName) ? parameterName : null;
+            var stringValue = request.QueryString.ContainsKey(parameterName) ? request.QueryString[parameterName] : null;
             
             
-            if (parameterType == typeof(int))
+            if (parameterType == typeof(int) && false)
             {
                 int x = 0;
                 var parsed = null != stringValue && int.TryParse(stringValue, out x);
@@ -38,3 +38,7 @@ namespace Turquoise.ParameterBinding
     }
     
 }
+//warning: File "/usr/bin/mono-sgen-gdb.py" auto-loading has been declined by your `auto-load safe-path' set to "$debugdir:$datadir/auto-load".
+//To enable execution of this file add
+//	add-auto-load-safe-path /usr/bin/mono-sgen-gdb.py
+//line to your configuration file "/home/davey/.gdbinit".
