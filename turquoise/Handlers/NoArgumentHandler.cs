@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using Turquoise;
+using Turquoise.ParameterBinding;
 
 namespace Turquoise.Handlers
 {
@@ -12,7 +14,7 @@ namespace Turquoise.Handlers
             _handler = handler;
         }
         
-        public object HandleRequest(IDictionary<string, string[]> queryString)
+        public object HandleRequest(Request request, List<ParameterBinder> parameterBinders)
         {
             return _handler();
         }

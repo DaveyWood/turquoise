@@ -7,6 +7,7 @@ using System.Text;
 using System.Globalization;
 using Turquoise.Routing;
 using Turquoise.Owin;
+using Turquoise.ParameterBinding;
 
 namespace Turquoise
 {
@@ -14,20 +15,28 @@ namespace Turquoise
     {
         //TODO: separate the Owin integration from the request handling
         private readonly Router _router = new Router();
+        
+        //TODO: this will probably be refactored out into a class once binding is based on more than type
+        private readonly List<ParameterBinder> _binders = new List<ParameterBinder>();
            
         //TODO: consider access level - this is primarily public for testing     
         public Task HandleRequest(string method, string path, string queryString,
+            IDictionary<string, string[]> requestHeaders,
+            Stream requestBody,
             IDictionary<string, string[]> responseHeaders,
             Stream responseStream, Action<int> setStatusCode)
         {
-            var parsedQueryString = ParseQueryString(queryString);
             
             var handler = _router.ResolveRoute(method, path);
             
             if (null != handler)
             {
+                var parsedQueryString = ParseQueryString(queryString);
+                var request = new Request { QueryString = parsedQueryString, 
+                    RequestHeaders = requestHeaders, RequestBody = requestBody};
                 //TODO: don't assume the return is a string
-                var result = handler.HandleRequest(parsedQueryString) as string;
+                var result = (handler.HandleRequest(request, _binders) ?? "").ToString();
+                
                 byte[] responseBytes = Encoding.UTF8.GetBytes(result);
                 responseHeaders["Content-Length"] = new string[] { responseBytes.Length.ToString(CultureInfo.InvariantCulture) };
                 responseHeaders["Content-Type"] = new string[] { "text/plain; charset=utf-8" };
@@ -79,7 +88,10 @@ namespace Turquoise
             return returnIt;
         }
     
-        
+        public void RegisterParameterBinder(ParameterBinder binder)
+        {
+            _binders.Insert(0, binder);
+        }
         
         public void RegisterResource(Resource resource)
         {

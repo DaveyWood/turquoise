@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using Xunit;
 using Turquoise.Routing;
 using Turquoise.Handlers;
+using Turquoise.ParameterBinding;
 
 namespace Turquoise.Tests.Routing
 {
@@ -11,6 +13,11 @@ namespace Turquoise.Tests.Routing
     // https://xunit.github.io/docs/getting-started-dnx.html
     public class SampleTest
     {
+        // defaults for tests that only really need to satisfy the parameters
+        private readonly List<ParameterBinder> _binders = new List<ParameterBinder>{ new DefaultBinder() };
+        private readonly Request _request = new Request { QueryString = new Dictionary<string, string[]>(),
+            RequestHeaders = new Dictionary<string, string[]>(), RequestBody = new MemoryStream() };
+        
         private IHandler MakeNoArgumentHandler(object returnValue)
         {
             return new NoArgumentHandler(() => returnValue);
@@ -22,7 +29,7 @@ namespace Turquoise.Tests.Routing
             var router = new Router();
             var handler = new object();
             router.AddRoute("GET", "foo", MakeNoArgumentHandler(handler));
-            Assert.Equal(handler, router.ResolveRoute("GET", "foo").HandleRequest(""));
+            Assert.Equal(handler, router.ResolveRoute("GET", "foo").HandleRequest(_request, _binders));
         }
         
         [Fact]
@@ -40,11 +47,11 @@ namespace Turquoise.Tests.Routing
             var router = new Router();
             var handler = new object();
             router.AddRoute("GET", "foo/bar", MakeNoArgumentHandler(handler));
-            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar").HandleRequest(""));
+            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar").HandleRequest(_request, _binders));
             
             var handler2 = new object();
             router.AddRoute("GET", "foo/bar/buzz", MakeNoArgumentHandler(handler2));
-            Assert.Equal(handler2, router.ResolveRoute("GET", "foo/bar/buzz/").HandleRequest(""));
+            Assert.Equal(handler2, router.ResolveRoute("GET", "foo/bar/buzz/").HandleRequest(_request, _binders));
         }
         
         [Fact]
@@ -53,10 +60,10 @@ namespace Turquoise.Tests.Routing
             var router = new Router();
             var handler = new object();
             router.AddRoute("GET", "foo/bar", MakeNoArgumentHandler(handler));
-            Assert.Equal(handler, router.ResolveRoute("GET", "/foo/bar").HandleRequest(""));
-            Assert.Equal(handler, router.ResolveRoute("GET", "/foo/bar/").HandleRequest(""));
-            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar").HandleRequest(""));
-            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar/").HandleRequest(""));
+            Assert.Equal(handler, router.ResolveRoute("GET", "/foo/bar").HandleRequest(_request, _binders));
+            Assert.Equal(handler, router.ResolveRoute("GET", "/foo/bar/").HandleRequest(_request, _binders));
+            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar").HandleRequest(_request, _binders));
+            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar/").HandleRequest(_request, _binders));
         }
         
         [Fact]
@@ -65,7 +72,7 @@ namespace Turquoise.Tests.Routing
             var router = new Router();
             var handler = new object();
             router.AddRoute("GET", "", MakeNoArgumentHandler(handler));
-            Assert.Equal(handler, router.ResolveRoute("GET", "/").HandleRequest(""));
+            Assert.Equal(handler, router.ResolveRoute("GET", "/").HandleRequest(_request, _binders));
         }
         
         [Fact]
@@ -82,11 +89,11 @@ namespace Turquoise.Tests.Routing
             router.AddRoute("GET", "foo/bar", MakeNoArgumentHandler(handler3));
             router.AddRoute("GET", "bar", MakeNoArgumentHandler(handler4));
             router.AddRoute("GET", "bar/foo", MakeNoArgumentHandler(handler5));
-            Assert.Equal(handler1, router.ResolveRoute("GET", "/").HandleRequest(""));
-            Assert.Equal(handler2, router.ResolveRoute("GET", "/foo").HandleRequest(""));
-            Assert.Equal(handler3, router.ResolveRoute("GET", "/foo/bar").HandleRequest(""));
-            Assert.Equal(handler4, router.ResolveRoute("GET", "bar/").HandleRequest(""));
-            Assert.Equal(handler5, router.ResolveRoute("GET", "bar/foo/").HandleRequest(""));
+            Assert.Equal(handler1, router.ResolveRoute("GET", "/").HandleRequest(_request, _binders));
+            Assert.Equal(handler2, router.ResolveRoute("GET", "/foo").HandleRequest(_request, _binders));
+            Assert.Equal(handler3, router.ResolveRoute("GET", "/foo/bar").HandleRequest(_request, _binders));
+            Assert.Equal(handler4, router.ResolveRoute("GET", "bar/").HandleRequest(_request, _binders));
+            Assert.Equal(handler5, router.ResolveRoute("GET", "bar/foo/").HandleRequest(_request, _binders));
         }
         
         [Fact]
