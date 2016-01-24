@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Turquoise.Routing;
+using Turquoise.Handlers;
 
 namespace Turquoise.Tests.Routing
 {
@@ -10,13 +11,18 @@ namespace Turquoise.Tests.Routing
     // https://xunit.github.io/docs/getting-started-dnx.html
     public class SampleTest
     {
+        private IHandler MakeNoArgumentHandler(object returnValue)
+        {
+            return new NoArgumentHandler(() => returnValue);
+        }
+        
         [Fact]
         public void RouteGetsAdded()
         {
             var router = new Router();
             var handler = new object();
-            router.AddRoute("GET", "foo", handler);
-            Assert.Equal(handler, router.ResolveRoute("GET", "foo"));
+            router.AddRoute("GET", "foo", MakeNoArgumentHandler(handler));
+            Assert.Equal(handler, router.ResolveRoute("GET", "foo").HandleRequest(""));
         }
         
         [Fact]
@@ -24,7 +30,7 @@ namespace Turquoise.Tests.Routing
         {
             var router = new Router();
             var handler = new object();
-            router.AddRoute("GET", "foo", handler);
+            router.AddRoute("GET", "foo", MakeNoArgumentHandler(handler));
             Assert.Null(router.ResolveRoute("GET", "foo/bar"));
         }
         
@@ -33,8 +39,12 @@ namespace Turquoise.Tests.Routing
         {
             var router = new Router();
             var handler = new object();
-            router.AddRoute("GET", "foo/bar", handler);
-            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar"));
+            router.AddRoute("GET", "foo/bar", MakeNoArgumentHandler(handler));
+            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar").HandleRequest(""));
+            
+            var handler2 = new object();
+            router.AddRoute("GET", "foo/bar/buzz", MakeNoArgumentHandler(handler2));
+            Assert.Equal(handler2, router.ResolveRoute("GET", "foo/bar/buzz/").HandleRequest(""));
         }
         
         [Fact]
@@ -42,11 +52,11 @@ namespace Turquoise.Tests.Routing
         {
             var router = new Router();
             var handler = new object();
-            router.AddRoute("GET", "foo/bar", handler);
-            Assert.Equal(handler, router.ResolveRoute("GET", "/foo/bar"));
-            Assert.Equal(handler, router.ResolveRoute("GET", "/foo/bar/"));
-            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar"));
-            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar/"));
+            router.AddRoute("GET", "foo/bar", MakeNoArgumentHandler(handler));
+            Assert.Equal(handler, router.ResolveRoute("GET", "/foo/bar").HandleRequest(""));
+            Assert.Equal(handler, router.ResolveRoute("GET", "/foo/bar/").HandleRequest(""));
+            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar").HandleRequest(""));
+            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar/").HandleRequest(""));
         }
         
         [Fact]
@@ -54,8 +64,8 @@ namespace Turquoise.Tests.Routing
         {
             var router = new Router();
             var handler = new object();
-            router.AddRoute("GET", "", handler);
-            Assert.Equal(handler, router.ResolveRoute("GET", "/"));
+            router.AddRoute("GET", "", MakeNoArgumentHandler(handler));
+            Assert.Equal(handler, router.ResolveRoute("GET", "/").HandleRequest(""));
         }
         
         [Fact]
@@ -67,16 +77,16 @@ namespace Turquoise.Tests.Routing
             var handler3 = new object();
             var handler4 = new object();
             var handler5 = new object();
-            router.AddRoute("GET", "", handler1);
-            router.AddRoute("GET", "foo", handler2);
-            router.AddRoute("GET", "foo/bar", handler3);
-            router.AddRoute("GET", "bar", handler4);
-            router.AddRoute("GET", "bar/foo", handler5);
-            Assert.Equal(handler1, router.ResolveRoute("GET", "/"));
-            Assert.Equal(handler2, router.ResolveRoute("GET", "/foo"));
-            Assert.Equal(handler3, router.ResolveRoute("GET", "/foo/bar"));
-            Assert.Equal(handler4, router.ResolveRoute("GET", "bar/"));
-            Assert.Equal(handler5, router.ResolveRoute("GET", "bar/foo/"));
+            router.AddRoute("GET", "", MakeNoArgumentHandler(handler1));
+            router.AddRoute("GET", "foo", MakeNoArgumentHandler(handler2));
+            router.AddRoute("GET", "foo/bar", MakeNoArgumentHandler(handler3));
+            router.AddRoute("GET", "bar", MakeNoArgumentHandler(handler4));
+            router.AddRoute("GET", "bar/foo", MakeNoArgumentHandler(handler5));
+            Assert.Equal(handler1, router.ResolveRoute("GET", "/").HandleRequest(""));
+            Assert.Equal(handler2, router.ResolveRoute("GET", "/foo").HandleRequest(""));
+            Assert.Equal(handler3, router.ResolveRoute("GET", "/foo/bar").HandleRequest(""));
+            Assert.Equal(handler4, router.ResolveRoute("GET", "bar/").HandleRequest(""));
+            Assert.Equal(handler5, router.ResolveRoute("GET", "bar/foo/").HandleRequest(""));
         }
         
         [Fact]
@@ -84,11 +94,11 @@ namespace Turquoise.Tests.Routing
         {
             var router = new Router();
             var handler = new object();
-            router.AddRoute("GET", "foo", handler);
-            router.AddRoute("POST", "foo", new object());
+            router.AddRoute("GET", "foo", MakeNoArgumentHandler(handler));
+            router.AddRoute("POST", "foo", MakeNoArgumentHandler(new object()));
             
-            //using a new object because double registering the same handler should throw now, but won't hurt anything either way
-            Assert.Throws<DuplicateRouteRegistrationException>(() => router.AddRoute("GET", "/foo", new object()));
+            //using a new object because double registering the same handler should throw now, but I don't know if I want that
+            Assert.Throws<DuplicateRouteRegistrationException>(() => router.AddRoute("GET", "/foo", MakeNoArgumentHandler(new object())));
         }
     }
 }

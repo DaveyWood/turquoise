@@ -31,7 +31,8 @@ namespace Turquoise.Owin
             var responseStream = turquoiseEnvironment.ResponseBody;
             var responseHeaders = turquoiseEnvironment.ResponseHeaders;
             
-            return runtime.HandleRequest(path, turquoiseEnvironment.RequestMethod, turquoiseEnvironment.ResponseHeaders,
+            return runtime.HandleRequest(turquoiseEnvironment.RequestMethod, path,
+                turquoiseEnvironment.RequestQueryString, turquoiseEnvironment.ResponseHeaders,
                 turquoiseEnvironment.ResponseBody, statusCode => { turquoiseEnvironment.ResponseStatusCode = statusCode; });
         }
     }

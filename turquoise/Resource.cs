@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using Turquoise.Handlers;
 
 namespace Turquoise
 {
     public abstract class Resource
     {
         private readonly string _basePath;
-        internal readonly List<Tuple<string, string, Func<object>>> Handlers = new List<Tuple<string, string, Func<object>>>();
+        internal readonly List<Tuple<string, string, IHandler>> Handlers = new List<Tuple<string, string, IHandler>>();
         
         //The base path for the resource
         public string BasePath
@@ -33,9 +34,9 @@ namespace Turquoise
             return _basePath + (path ?? "").TrimStart('/');
         }
         
-        public void MapHandler(string method, string path, Func<object> handler)
+        private void MapHandler(string method, string path, Func<object> handler)
         {
-            Handlers.Add(Tuple.Create(method, AppendBasePath(path), handler));            
+            Handlers.Add(Tuple.Create(method, AppendBasePath(path), new NoArgumentHandler(handler) as IHandler));            
         }
         
         public void Get(string path, Func<object> handler)

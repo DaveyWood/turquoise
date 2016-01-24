@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Turquoise.Handlers;
 
 namespace Turquoise.Routing
 {
@@ -13,7 +14,7 @@ namespace Turquoise.Routing
         // else if there is an exact match in named child nodes we go there
         // else we iterate through the token nodes until there is a match
         
-        private object Handler {get; set;}
+        private IHandler Handler {get; set;}
         
         private readonly IDictionary<string, RoutingNode> _namedChildNodes = new Dictionary<string, RoutingNode>();
         
@@ -21,7 +22,7 @@ namespace Turquoise.Routing
         
         //TODO: rewrite with an immutable list or a start index instead of making all these lists
         //TODO: add support for token nodes
-        public object GetNodeForPath(List<string> pathParts)
+        public IHandler GetNodeForPath(List<string> pathParts)
         {
             if(pathParts.Count == 0)
             {
@@ -40,7 +41,7 @@ namespace Turquoise.Routing
             return null;
         }
         
-        internal void AddNodeForPath(List<string> pathParts, string path, object handler)
+        internal void AddNodeForPath(List<string> pathParts, string path, IHandler handler)
         {
             //TODO support for the next part being a token
             if (pathParts.Count == 0)

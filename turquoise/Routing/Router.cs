@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Turquoise.Handlers;
 
 namespace Turquoise.Routing
 {
@@ -10,7 +11,7 @@ namespace Turquoise.Routing
         
         //TODO: handlers shouldn't really be objects
         //TODO: tons of shared code between these methods
-        public void AddRoute(string method, string path, object handler)
+        public void AddRoute(string method, string path, IHandler handler)
         {
             var pathList = path.Split('/').Where(s => !String.IsNullOrEmpty(s)).Select(s => s.ToLowerInvariant());
             method = method.ToUpperInvariant();
@@ -26,7 +27,7 @@ namespace Turquoise.Routing
             
         }
         
-        public object ResolveRoute(string method, string path)
+        public IHandler ResolveRoute(string method, string path)
         {
             var pathList = path.Split('/').Where(s => !String.IsNullOrEmpty(s)).Select(s => s.ToLowerInvariant());
             method = method.ToUpperInvariant();

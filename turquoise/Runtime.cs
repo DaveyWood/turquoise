@@ -16,16 +16,17 @@ namespace Turquoise
         private readonly Router _router = new Router();
            
         //TODO: consider access level - this is primarily public for testing     
-        public Task HandleRequest(string path, string method, IDictionary<string, string[]> responseHeaders,
+        public Task HandleRequest(string method, string path, string queryString,
+            IDictionary<string, string[]> responseHeaders,
             Stream responseStream, Action<int> setStatusCode)
         {
             
             
-            var handler = _router.ResolveRoute(method, path) as Func<object>;
+            var handler = _router.ResolveRoute(method, path);
             
             if (null != handler)
             {
-                var result = handler() as string;
+                var result = handler.HandleRequest(queryString) as string;
                 byte[] responseBytes = Encoding.UTF8.GetBytes(result);
                 responseHeaders["Content-Length"] = new string[] { responseBytes.Length.ToString(CultureInfo.InvariantCulture) };
                 responseHeaders["Content-Type"] = new string[] { "text/plain; charset=utf-8" };

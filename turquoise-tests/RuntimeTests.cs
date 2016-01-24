@@ -25,7 +25,7 @@ namespace Turquoise.Tests
             var resource = new TestResource();
             runtime.RegisterResource(resource);
             
-            var task = runtime.HandleRequest("foo", "GET", responseHeaders,
+            var task = runtime.HandleRequest("GET", "foo", "", responseHeaders,
                 responseStream, setStatusCode);
             Task.WaitAll(task);
             
@@ -53,7 +53,7 @@ namespace Turquoise.Tests
             var resource = new TestResource();
             runtime.RegisterResource(resource);
             
-            var task = runtime.HandleRequest("foo2", "GET", responseHeaders,
+            var task = runtime.HandleRequest("GET", "foo2", "", responseHeaders,
                 responseStream, setStatusCode);
             Task.WaitAll(task);
             
