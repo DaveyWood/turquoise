@@ -78,5 +78,17 @@ namespace Turquoise.Tests.Routing
             Assert.Equal(handler4, router.ResolveRoute("GET", "bar/"));
             Assert.Equal(handler5, router.ResolveRoute("GET", "bar/foo/"));
         }
+        
+        [Fact]
+        public void DuplicatePathsShouldThrow()
+        {
+            var router = new Router();
+            var handler = new object();
+            router.AddRoute("GET", "foo", handler);
+            router.AddRoute("POST", "foo", new object());
+            
+            //using a new object because double registering the same handler should throw now, but won't hurt anything either way
+            Assert.Throws<DuplicateRouteRegistrationException>(() => router.AddRoute("GET", "/foo", new object()));
+        }
     }
 }

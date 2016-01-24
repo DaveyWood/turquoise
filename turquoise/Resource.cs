@@ -6,7 +6,7 @@ namespace Turquoise
     public abstract class Resource
     {
         private readonly string _basePath;
-        internal readonly List<Tuple<string, Func<object>>> Handlers = new List<Tuple<string, Func<object>>>();
+        internal readonly List<Tuple<string, string, Func<object>>> Handlers = new List<Tuple<string, string, Func<object>>>();
         
         //The base path for the resource
         public string BasePath
@@ -33,14 +33,19 @@ namespace Turquoise
             return _basePath + (path ?? "").TrimStart('/');
         }
         
-        public void MapGet(string path, Func<object> handler)
+        public void MapHandler(string method, string path, Func<object> handler)
         {
-            Handlers.Add(Tuple.Create(AppendBasePath(path), handler));
+            Handlers.Add(Tuple.Create(method, AppendBasePath(path), handler));            
         }
         
-        public void MapGet(Func<object> handler)
+        public void Get(string path, Func<object> handler)
         {
-            MapGet("", handler);
+            MapHandler("GET", path, handler);
+        }
+        
+        public void Get(Func<object> handler)
+        {
+            Get("", handler);
         }
     }
 }

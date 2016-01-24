@@ -5,8 +5,8 @@ public class FooResource : Resource
     public FooResource()
         : base("/Foo")
     {
-        MapGet(() => "Hello Foo!");
-        MapGet("bar", () => "Hello Bar!");
+        Get(() => "Hello Foo!");
+        Get("bar", () => "Hello Bar!");
     }
     
 }

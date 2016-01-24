@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text;
 using System.Globalization;
+using Turquoise.Routing;
+
 
 
 using MidFunc = System.Func<System.Func<System.Collections.Generic.IDictionary<string, object>,
@@ -16,8 +18,8 @@ namespace Turquoise.Owin
 
     public class Runtime
     {
-        //TODO: routing
-        private readonly Dictionary<string, Func<object>> _handlers = new Dictionary<string, Func<object>>();
+        //TODO: separate the Owin integration from the request handling
+        private readonly Router _router = new Router();
         
         public Func<IDictionary<string, object>, Task> DoStuff(Func<IDictionary<string, object>, Task> innerHandler)
         {
@@ -31,9 +33,10 @@ namespace Turquoise.Owin
             var responseStream = turquoiseEnvironment.ResponseBody;
             var responseHeaders = turquoiseEnvironment.ResponseHeaders;
             
-            if (_handlers.ContainsKey(path))
+            var handler = _router.ResolveRoute(turquoiseEnvironment.RequestMethod, path) as Func<object>;
+            
+            if (null != handler)
             {
-                var handler = _handlers[path];
                 var result = handler() as string;
                 byte[] responseBytes = Encoding.UTF8.GetBytes(result);
                 responseHeaders["Content-Length"] = new string[] { responseBytes.Length.ToString(CultureInfo.InvariantCulture) };
@@ -44,7 +47,7 @@ namespace Turquoise.Owin
             else
             {
                 turquoiseEnvironment.ResponseStatusCode = 404;
-                var text = path + " not found\nAvailable paths are: " + String.Join(", ", _handlers.Keys);
+                var text = path + " not found";
                 byte[] responseBytes = Encoding.UTF8.GetBytes(text);
                 responseHeaders["Content-Length"] = new string[] { responseBytes.Length.ToString(CultureInfo.InvariantCulture) };
                 responseHeaders["Content-Type"] = new string[] { "text/plain" };
@@ -66,7 +69,7 @@ namespace Turquoise.Owin
         {
             foreach (var handler in resource.Handlers)
             {
-                _handlers[handler.Item1] = handler.Item2;
+                _router.AddRoute(handler.Item1, handler.Item2, handler.Item3);
             }
         }
     }
