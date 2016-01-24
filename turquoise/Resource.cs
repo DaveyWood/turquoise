@@ -41,7 +41,7 @@ namespace Turquoise
             {
                 Handlers.Add(Tuple.Create(method, AppendBasePath(path), new NoArgumentHandler((Func<object>)handler) as IHandler));         
             }
-            else if (1 == parameters.Length)
+            else
             {
                 Handlers.Add(Tuple.Create(method, AppendBasePath(path), new Handler(handler) as IHandler)); 
             }
@@ -64,6 +64,33 @@ namespace Turquoise
         public void Get<T>(Func<T, object> handler)
         {
             Get<T>("", handler);
+        }
+        public void Get<T, T2>(string path, Func<T, T2, object> handler)
+        {
+            MapHandler("GET", path, handler);
+        }
+        
+        public void Get<T, T2>(Func<T, T2, object> handler)
+        {
+            Get<T, T2>("", handler);
+        }
+        public void Get<T, T2, T3>(string path, Func<T, T2, T3, object> handler)
+        {
+            MapHandler("GET", path, handler);
+        }
+        
+        public void Get<T, T2, T3>(Func<T, T2, T3, object> handler)
+        {
+            Get<T, T2, T3>("", handler);
+        }
+        public void Get<T, T2, T3, T4>(string path, Func<T, T2, T3, T4, object> handler)
+        {
+            MapHandler("GET", path, handler);
+        }
+        
+        public void Get<T, T2, T3, T4>(Func<T, T2, T3, T4, object> handler)
+        {
+            Get<T, T2, T3, T4>("", handler);
         }
         
     }
