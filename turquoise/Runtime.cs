@@ -14,8 +14,9 @@ namespace Turquoise
     {
         //TODO: separate the Owin integration from the request handling
         private readonly Router _router = new Router();
-                
-        internal Task HandleRequest(string path, string method, IDictionary<string, string[]> responseHeaders,
+           
+        //TODO: consider access level - this is primarily public for testing     
+        public Task HandleRequest(string path, string method, IDictionary<string, string[]> responseHeaders,
             Stream responseStream, Action<int> setStatusCode)
         {
             
