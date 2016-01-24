@@ -1,16 +1,17 @@
 {
     "version": "1.0.0-*",
     "description": "",
-    "authors": [ "" ],
+    "authors": [ "Davey Wood" ],
     "tags": [ "" ],
     "projectUrl": "",
     "licenseUrl": "",
     "tooling": {
-      "defaultNamespace": "turquoise_tests"
+      "defaultNamespace": "Turquoise.Tests"
     },
     "dependencies": {
         "xunit": "2.1.0",
-        "xunit.runner.dnx": "2.1.0-rc1-build204"
+        "xunit.runner.dnx": "2.1.0-rc1-build204",
+        "turquoise": ""
     },
     "commands": {
         "test": "xunit.runner.dnx"

@@ -6,9 +6,11 @@ namespace Turquoise.Routing
 {
     public class Router
     {
-        private readonly IDictionary<string, RoutingNode> _routeTrees = new Dictionary<string, RoutingNode>(6);
+        private readonly IDictionary<string, RoutingNode> _routeTrees = new Dictionary<string, RoutingNode>();
         
-        public void AddRoute(string path, string method, object handler)
+        //TODO: handlers shouldn't really be objects
+        //TODO: tons of shared code between these methods
+        public void AddRoute(string method, string path, object handler)
         {
             var pathList = path.Split('/').Where(s => !String.IsNullOrEmpty(s)).Select(s => s.ToLowerInvariant());
             method = method.ToUpperInvariant();
@@ -22,6 +24,20 @@ namespace Turquoise.Routing
             var root = _routeTrees[method];
             root.AddNodeForPath(pathList.ToList(), path, handler);
             
+        }
+        
+        public object ResolveRoute(string method, string path)
+        {
+            var pathList = path.Split('/').Where(s => !String.IsNullOrEmpty(s)).Select(s => s.ToLowerInvariant());
+            method = method.ToUpperInvariant();
+            
+            if (!_routeTrees.ContainsKey(method))
+            {
+                return null;
+            }
+            
+            var root = _routeTrees[method];
+            return root.GetNodeForPath(pathList.ToList());
         }
     }
 }

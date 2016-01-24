@@ -13,19 +13,19 @@ namespace Turquoise.Routing
         // else if there is an exact match in named child nodes we go there
         // else we iterate through the token nodes until there is a match
         
-        public object Handler {get; set;}
+        private object Handler {get; set;}
         
-        public readonly IDictionary<string, RoutingNode> _namedChildNodes = new Dictionary<string, RoutingNode>();
+        private readonly IDictionary<string, RoutingNode> _namedChildNodes = new Dictionary<string, RoutingNode>();
         
-        public readonly RoutingNode _tokenNode = new RoutingNode();
+        private RoutingNode _tokenNode = null;
         
         //TODO: rewrite with an immutable list or a start index instead of making all these lists
         //TODO: add support for token nodes
-        public RoutingNode GetNodeForPath(List<string> pathParts)
+        public object GetNodeForPath(List<string> pathParts)
         {
             if(pathParts.Count == 0)
             {
-                return this;
+                return this.Handler;
             }
             else if(_namedChildNodes.ContainsKey(pathParts[0]))
             {
@@ -62,7 +62,7 @@ namespace Turquoise.Routing
                     subsequentTokens.Add(pathParts[i]);
                 }
                 
-                var nextPart = subsequentTokens[0];
+                var nextPart = pathParts[0];
                 
                 if (!_namedChildNodes.ContainsKey(nextPart))
                 {
