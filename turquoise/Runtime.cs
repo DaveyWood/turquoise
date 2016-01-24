@@ -6,51 +6,38 @@ using System.IO;
 using System.Text;
 using System.Globalization;
 using Turquoise.Routing;
+using Turquoise.Owin;
 
-
-
-using MidFunc = System.Func<System.Func<System.Collections.Generic.IDictionary<string, object>,
-        System.Threading.Tasks.Task>, System.Func<System.Collections.Generic.IDictionary<string, object>,
-        System.Threading.Tasks.Task>>;
-
-namespace Turquoise.Owin
+namespace Turquoise
 {
-
     public class Runtime
     {
         //TODO: separate the Owin integration from the request handling
         private readonly Router _router = new Router();
-        
-        public Func<IDictionary<string, object>, Task> DoStuff(Func<IDictionary<string, object>, Task> innerHandler)
+                
+        internal Task HandleRequest(string path, string method, IDictionary<string, string[]> responseHeaders,
+            Stream responseStream, Action<int> setStatusCode)
         {
-            return this.Handler;
-        }
-        
-        private Task Handler(IDictionary<string, object> environment)
-        {
-            var turquoiseEnvironment = new OwinEnvironment(environment);
-            var path = turquoiseEnvironment.RequestPath;
-            var responseStream = turquoiseEnvironment.ResponseBody;
-            var responseHeaders = turquoiseEnvironment.ResponseHeaders;
             
-            var handler = _router.ResolveRoute(turquoiseEnvironment.RequestMethod, path) as Func<object>;
+            
+            var handler = _router.ResolveRoute(method, path) as Func<object>;
             
             if (null != handler)
             {
                 var result = handler() as string;
                 byte[] responseBytes = Encoding.UTF8.GetBytes(result);
                 responseHeaders["Content-Length"] = new string[] { responseBytes.Length.ToString(CultureInfo.InvariantCulture) };
-                responseHeaders["Content-Type"] = new string[] { "text/plain" };
+                responseHeaders["Content-Type"] = new string[] { "text/plain; charset=utf-8" };
 
                 return responseStream.WriteAsync(responseBytes, 0, responseBytes.Length);
             }
             else
             {
-                turquoiseEnvironment.ResponseStatusCode = 404;
+                setStatusCode(404);
                 var text = path + " not found";
                 byte[] responseBytes = Encoding.UTF8.GetBytes(text);
                 responseHeaders["Content-Length"] = new string[] { responseBytes.Length.ToString(CultureInfo.InvariantCulture) };
-                responseHeaders["Content-Type"] = new string[] { "text/plain" };
+                responseHeaders["Content-Type"] = new string[] { "text/plain; charset=utf-8" };
                 return responseStream.WriteAsync(responseBytes, 0, responseBytes.Length);
             }
 
@@ -59,11 +46,7 @@ namespace Turquoise.Owin
             
         }
     
-        public Action<MidFunc> UseTurquoise(Action<MidFunc> builder)
-        {
-            builder(this.DoStuff);
-            return builder;
-        }
+        
         
         public void RegisterResource(Resource resource)
         {
@@ -74,10 +57,3 @@ namespace Turquoise.Owin
         }
     }
 }
-
-/*
-
-Func<Func<IDictionary<string, object>, Task>, 
-Func<IDictionary<string, object>, Task>>
-
-*/

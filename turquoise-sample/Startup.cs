@@ -7,6 +7,7 @@ using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Turquoise.Owin;
+using Turquoise;
 
 namespace turquoise_sample
 {
@@ -23,7 +24,7 @@ namespace turquoise_sample
         {
             var runtime = new Runtime();
             runtime.RegisterResource(new FooResource());
-            app.UseOwin(builder => runtime.UseTurquoise(builder));
+            app.UseOwin(builder => builder.UseTurquoise(runtime));
             //app.UseServer();
             
             // app.UseIISPlatformHandler();
