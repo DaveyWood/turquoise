@@ -17,7 +17,7 @@ namespace Turquoise
         private readonly Router _router = new Router();
         
         //TODO: this will probably be refactored out into a class once binding is based on more than type
-        private readonly List<ParameterBinder> _binders = new List<ParameterBinder>{ new DefaultBinder() };
+        private readonly List<ParameterBinder> _binders = new List<ParameterBinder>{ new RequestBinder(), new DefaultBinder() };
            
         //TODO: consider access level - this is primarily public for testing     
         public Task HandleRequest(string method, string path, string queryString,
