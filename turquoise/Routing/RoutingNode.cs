@@ -37,6 +37,17 @@ namespace Turquoise.Routing
                 }
                 return _namedChildNodes[pathParts[0]].GetNodeForPath(subsequentTokens);
             }
+            else if (null != _tokenNode) //token node catches anything, since this would be the value
+            {
+                //TODO: store the token value!
+                //TODO: when the subsequent tokens stuff is refactored to not be a new list don't copy/paste so much
+                var subsequentTokens = new List<string>(pathParts.Count -1);
+                for(var i = 1; i < pathParts.Count; i++)
+                {
+                    subsequentTokens.Add(pathParts[i]);
+                }
+                return _tokenNode.GetNodeForPath(subsequentTokens);
+            }
             
             return null;
         }
@@ -57,6 +68,7 @@ namespace Turquoise.Routing
             }
             else
             {
+                //TODO: use a data structure that doesn't require building new lists every time, it's silly
                 var subsequentTokens = new List<string>(pathParts.Count -1);
                 for(var i = 1; i < pathParts.Count; i++)
                 {
@@ -64,12 +76,23 @@ namespace Turquoise.Routing
                 }
                 
                 var nextPart = pathParts[0];
-                
-                if (!_namedChildNodes.ContainsKey(nextPart))
+                if (nextPart.StartsWith("{") && nextPart.EndsWith("}")) //next part is token
                 {
-                    _namedChildNodes[nextPart] = new RoutingNode();
+                    if (null == _tokenNode)
+                    {
+                        _tokenNode = new RoutingNode();
+                    }
+                    
+                    _tokenNode.AddNodeForPath(subsequentTokens, path, handler);
                 }
-                _namedChildNodes[nextPart].AddNodeForPath(subsequentTokens, path, handler);
+                else
+                {
+                    if (!_namedChildNodes.ContainsKey(nextPart))
+                    {
+                        _namedChildNodes[nextPart] = new RoutingNode();
+                    }
+                    _namedChildNodes[nextPart].AddNodeForPath(subsequentTokens, path, handler);
+                }
             }
             
         }

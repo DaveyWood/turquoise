@@ -107,5 +107,19 @@ namespace Turquoise.Tests.Routing
             //using a new object because double registering the same handler should throw now, but I don't know if I want that
             Assert.Throws<DuplicateRouteRegistrationException>(() => router.AddRoute("GET", "/foo", MakeNoArgumentHandler(new object())));
         }
+        
+        [Fact]
+        public void TokenizedRoutesResolve()
+        {
+            var router = new Router();
+            var handler = new object();
+            var handler2 = new object();
+            
+            router.AddRoute("GET", "foo/{nah}", MakeNoArgumentHandler(handler));
+            router.AddRoute("GET", "foo/{nah}/bar", MakeNoArgumentHandler(handler2));
+            
+            Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar").HandleRequest(_request, _binders));
+            Assert.Equal(handler2, router.ResolveRoute("GET", "foo/bar/bar").HandleRequest(_request, _binders));
+        }
     }
 }
