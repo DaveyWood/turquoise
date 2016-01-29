@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Xunit;
 using Turquoise;
+using turquoise_mocks;
 using System.Threading.Tasks;
 using System.IO;
 
@@ -72,12 +73,5 @@ namespace Turquoise.Tests
 
     }
     
-    public class TestResource : Resource
-    {
-        public TestResource()
-        {
-            Get("Foo", () => "foo");
-            
-        }
-    }
+    
 }

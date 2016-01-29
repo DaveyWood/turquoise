@@ -16,10 +16,11 @@ namespace Turquoise.ParameterBinding
         
         public override object Bind(Request request, string parameterName, Type parameterType)
         {
-            var stringValue = request.QueryString.ContainsKey(parameterName) ? request.QueryString[parameterName] : null;
+            //TODO: what if there are multiple values here?
+            var stringValue = request.QueryString.ContainsKey(parameterName) ? request.QueryString[parameterName][0] : null;
             
             
-            if (parameterType == typeof(int) && false)
+            if (parameterType == typeof(int))
             {
                 int x = 0;
                 var parsed = null != stringValue && int.TryParse(stringValue, out x);

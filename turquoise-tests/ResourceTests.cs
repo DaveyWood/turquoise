@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Xunit;
 using Turquoise;
+using turquoise_mocks;
 using System.Threading.Tasks;
 using System.IO;
 
@@ -14,7 +15,7 @@ namespace Turquoise.Tests
     public class ResourceTests
     {
         [Fact]
-        public void GetReturnsFoo()
+        public void GetReturns4t6()
         {
             var responseHeaders = new Dictionary<string, string[]>();
             var responseStream = new MemoryStream();
@@ -23,7 +24,7 @@ namespace Turquoise.Tests
             //set status code defaults to 200, so it's not called
             Action<int> setStatusCode = i => {};
             var runtime = new Runtime();
-            var resource = new ResourceTestResource();
+            var resource = new TestResource();
             runtime.RegisterResource(resource);
             
             var task = runtime.HandleRequest("GET", "foo/yippy", "x=4&y=t6", responseHeaders, requestBody, responseHeaders,
@@ -44,14 +45,5 @@ namespace Turquoise.Tests
         
 
     }
-    
-    public class ResourceTestResource : Resource
-    {
-        public ResourceTestResource()
-            : base("foo")
-        {
-            Get("Foo", () => "foo");
-            Get("yippy", (int x, string y) => x + y);
-        }
-    }
+   
 }

@@ -1,0 +1,18 @@
+{
+  "version": "1.0.0-*",
+  "description": "turquoise_mocks Class Library",
+  "authors": [ "Class Library template" ],
+  "tags": [""],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "tooling": {
+    "defaultNamespace": "turquoise_mocks"
+  },
+    "dependencies": {
+        "turquoise": ""
+    },
+
+  "frameworks": {
+    "net451": { }
+  }
+}
