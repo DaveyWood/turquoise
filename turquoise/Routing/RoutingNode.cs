@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Turquoise.Handlers;
 
@@ -18,14 +19,36 @@ namespace Turquoise.Routing
         
         private readonly IDictionary<string, RoutingNode> _namedChildNodes = new Dictionary<string, RoutingNode>();
         
-        private RoutingNode _tokenNode = null;
+        private readonly List<Tuple<int, string>> _tokenPositionsAndNames = new List<Tuple<int, string>>();
         
+        private RoutingNode _tokenNode = null;
+                
         //The name of the node - for a token this will be the token value
         public string Name {get; private set;}
         
         public RoutingNode(string name)
         {
-            Name = name;
+            Name = name;   
+        }
+        
+        private void SetTokenPositionsAndNames(string[] pathParts)
+        {
+            //find tokens
+            for (var i = 0; i < pathParts.Length; i++)
+            {
+                if (pathParts[i].StartsWith("{") && pathParts[i].EndsWith("}"))
+                {
+                    _tokenPositionsAndNames.Add(Tuple.Create(i, pathParts[i].Substring(1, pathParts[i].Length - 2)));
+                }
+            }
+        }
+        
+        private void PopulateRouteTokens(string[] pathParts, IDictionary<string, string> routeTokens)
+        {
+            foreach (var tokenTuple in _tokenPositionsAndNames)
+            {
+                routeTokens[tokenTuple.Item2] = pathParts[tokenTuple.Item1];
+            }
         }
         
         //TODO: rewrite with an immutable list or a start index instead of making all these lists
@@ -34,6 +57,7 @@ namespace Turquoise.Routing
         {
             if(pathParts.Length == index)
             {
+                PopulateRouteTokens(pathParts, routeTokens);
                 return this.Handler;
             }
             else if(_namedChildNodes.ContainsKey(pathParts[index]))
@@ -43,8 +67,6 @@ namespace Turquoise.Routing
             }
             else if (null != _tokenNode) //token node catches anything, since this would be the value
             {
-                //TODO: store the token value!
-                
                 return _tokenNode.GetNodeForPath(pathParts, index + 1, routeTokens);
             }
             
@@ -58,6 +80,7 @@ namespace Turquoise.Routing
                 if(Handler == null)
                 {
                     Handler = handler;
+                    SetTokenPositionsAndNames(pathParts);
                 }
                 else
                 {

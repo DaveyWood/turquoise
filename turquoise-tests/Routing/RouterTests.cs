@@ -11,7 +11,7 @@ namespace Turquoise.Tests.Routing
 {
     // see example explanation on xUnit.net website:
     // https://xunit.github.io/docs/getting-started-dnx.html
-    public class SampleTest
+    public class RouterTests
     {
         // defaults for tests that only really need to satisfy the parameters
         private readonly List<ParameterBinder> _binders = new List<ParameterBinder>{ new DefaultBinder() };
@@ -141,14 +141,9 @@ namespace Turquoise.Tests.Routing
             
             Assert.Equal(handler, router.ResolveRoute("GET", "foo/bar", routeTokens).HandleRequest(_request, _binders));
             Assert.Equal(routeTokens.Count, 1);
-            Console.WriteLine(routeTokens.Keys.First());
             Assert.Equal(routeTokens["nah"], "bar");
             Assert.Equal(handler2, router.ResolveRoute("GET", "foo/buzz/bar", routeTokens).HandleRequest(_request, _binders));
-            //BUG - the token node can't be based on name, this ends up as "nah" all the time
-            foreach (string item in routeTokens.Keys)
-            {
-                Console.WriteLine(item);
-            }
+            
             Assert.Equal(routeTokens["yep"], "buzz");
         }
     }
