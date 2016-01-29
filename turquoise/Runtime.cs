@@ -27,13 +27,14 @@ namespace Turquoise
             Stream responseStream, Action<int> setStatusCode)
         {
             
-            var handler = _router.ResolveRoute(method, path);
+            var parsedQueryString = ParseQueryString(queryString);
+            var request = new Request { QueryString = parsedQueryString, 
+                RequestHeaders = requestHeaders, RequestBody = requestBody,
+                RouteTokens = new Dictionary<string, string>()};
+            var handler = _router.ResolveRoute(method, path, request.RouteTokens);
             
             if (null != handler)
             {
-                var parsedQueryString = ParseQueryString(queryString);
-                var request = new Request { QueryString = parsedQueryString, 
-                    RequestHeaders = requestHeaders, RequestBody = requestBody};
                 //TODO: don't assume the return is a string
                 var result = (handler.HandleRequest(request, _binders) ?? "").ToString();
                 

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Turquoise;
 using Turquoise.Handlers;
 
 namespace Turquoise.Routing
@@ -19,15 +20,15 @@ namespace Turquoise.Routing
             if (!_routeTrees.ContainsKey(method))
             {
                 //add root route for method
-                _routeTrees[method] = new RoutingNode();
+                _routeTrees[method] = new RoutingNode(method);
             }
             
             var root = _routeTrees[method];
-            root.AddNodeForPath(pathList.ToList(), path, handler);
+            root.AddNodeForPath(pathList.ToArray(), 0, path, handler);
             
         }
         
-        public IHandler ResolveRoute(string method, string path)
+        public IHandler ResolveRoute(string method, string path, IDictionary<string, string> routeTokens)
         {
             var pathList = path.Split('/').Where(s => !String.IsNullOrEmpty(s)).Select(s => s.ToLowerInvariant());
             method = method.ToUpperInvariant();
@@ -38,7 +39,7 @@ namespace Turquoise.Routing
             }
             
             var root = _routeTrees[method];
-            return root.GetNodeForPath(pathList.ToList());
+            return root.GetNodeForPath(pathList.ToArray(), 0, routeTokens);
         }
     }
 }
