@@ -39,7 +39,3 @@ namespace Turquoise.ParameterBinding
     }
     
 }
-//warning: File "/usr/bin/mono-sgen-gdb.py" auto-loading has been declined by your `auto-load safe-path' set to "$debugdir:$datadir/auto-load".
-//To enable execution of this file add
-//	add-auto-load-safe-path /usr/bin/mono-sgen-gdb.py
-//line to your configuration file "/home/davey/.gdbinit".
