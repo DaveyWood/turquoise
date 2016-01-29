@@ -17,8 +17,17 @@ namespace Turquoise.ParameterBinding
         public override object Bind(Request request, string parameterName, Type parameterType)
         {
             //TODO: what if there are multiple values here?
-            var stringValue = request.QueryString.ContainsKey(parameterName) ? request.QueryString[parameterName][0] : null;
+            //var stringValue = request.QueryString.ContainsKey(parameterName) ? request.QueryString[parameterName][0] : null;
+            string stringValue = null;
             
+            if (request.RouteTokens.ContainsKey(parameterName))
+            {
+                stringValue = request.RouteTokens[parameterName];
+            }
+            else if (request.QueryString.ContainsKey(parameterName))
+            {
+                stringValue = request.QueryString[parameterName][0];
+            }
             
             if (parameterType == typeof(int))
             {

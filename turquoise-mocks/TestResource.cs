@@ -13,6 +13,7 @@ namespace turquoise_mocks
             Get("Foo", () => "foo");
             Get("foo/yippy", (int x, string y) => x + y);
             Get("foo/request", (Request req) => req.QueryString.Count);
+            Get("foo/yippy/{x}/{y}", (int x, string y) => x + y);
         }
     }
 }
