@@ -1,5 +1,6 @@
 using Turquoise;
 using System;
+using System.Linq.Expressions;
 
 public class FooResource : Resource
 {
@@ -10,14 +11,14 @@ public class FooResource : Resource
         Get(() => "Hello Foo!");
         
         //single argument, declared as Func
-        Func<string, object> meh = s => s.Length.ToString();
+        Expression<Func<string, object>> meh = s => s.Length.ToString();
         Get("bar/zip", meh);
         
         //single argument, inline - generics can't be inferred
-        Get<int>("bar", a => "" + a++);
+        Get<int>("bar", a => "" + a + 1);
         
-        //single argument, old syntax. generics inferred.
-        Get("zip", delegate (int x) {return "" + x;});
+        //single argument. generics inferred.
+        Get("zip", (int x) => x.ToString());
         
         //two parameters
         Get<string, int>("zap", (x, y) => x + y);

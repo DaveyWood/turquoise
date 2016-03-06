@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.IO;
 using Xunit;
 using Turquoise.Routing;
@@ -21,7 +22,7 @@ namespace Turquoise.Tests.Routing
         
         private IHandler MakeNoArgumentHandler(object returnValue)
         {
-            return new NoArgumentHandler(() => returnValue);
+            return new Handler((Expression<Func<object>>)(() => returnValue));
         }
         
         [Fact]

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Linq;
+using System.Linq.Expressions;
 using Turquoise;
 using Turquoise.ParameterBinding;
 
@@ -10,15 +12,12 @@ namespace Turquoise.Handlers
     public class Handler : IHandler
     {
         private readonly Delegate _handler;
-        private readonly ParameterInfo[] _parameters;
+        private readonly ReadOnlyCollection<ParameterExpression> _parameters;
         
-        public Handler(Delegate handler)
+        public Handler(LambdaExpression handler)
         {
-            _handler = handler;
-            //the compiler should guarantee there is exactly one parameter here
-            _parameters = handler.Method.GetParameters();
-            //_parameterName = parameter.Name;
-            //_parameterType = parameter.ParameterType;
+            _handler = handler.Compile();
+            _parameters = handler.Parameters;
         }
         
         public object HandleRequest(Request request, List<ParameterBinder> parameterBinders)
@@ -34,12 +33,12 @@ namespace Turquoise.Handlers
             // object castValue = Convert.ChangeType(stringValue, _parameterType);
             
             
-            return _handler.Method.Invoke(_handler.Target, callValues);
+            return _handler.DynamicInvoke(callValues);
         }
         
-        private object BindParameter(ParameterInfo parameter, Request request, List<ParameterBinder> parameterBinders)
+        private object BindParameter(ParameterExpression parameter, Request request, List<ParameterBinder> parameterBinders)
         {
-            var binder = parameterBinders.FirstOrDefault(b => b.SupportsType(parameter.ParameterType));
+            var binder = parameterBinders.FirstOrDefault(b => b.SupportsType(parameter.Type));
             
             if (null == binder)
             {
@@ -47,7 +46,7 @@ namespace Turquoise.Handlers
                 return null;
             }
             
-            return binder.Bind(request, parameter.Name, parameter.ParameterType);
+            return binder.Bind(request, parameter.Name, parameter.Type);
             
             
         }
