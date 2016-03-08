@@ -50,9 +50,15 @@ namespace Turquoise.ParameterBinding
             {
                 return BindPrimitive(request, parameterName, parameterType);
             }
-            
+                        
             // TODO: content negotiation, assume JSON for this pass
             var requestBody = request.RequestBody;
+            
+            if (null == requestBody)
+            {
+                return null;
+            }
+            
             using (var streamReader = new StreamReader(requestBody))
             {
                 using (var jsonReader = new JsonTextReader(streamReader))

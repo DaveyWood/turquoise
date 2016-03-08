@@ -75,7 +75,39 @@ namespace Turquoise.Tests.ParameterBinding
             Assert.Equal("turquoise", binder.Bind(request, "myString", typeof(string)));
             
         }
-
+        
+        [Fact]
+        public void BodyGetsDeserializedAsJson()
+        {
+            var binder = new DefaultBinder();
+            
+            var request = new Request { RequestBody = GenerateStreamFromString("{ \"name\": \"Fred\", \"isBig\": true }") };
+            
+            var boundBird = binder.Bind(request, "bird", typeof(Bird)) as Bird;
+            
+            Assert.NotNull(boundBird);
+            Assert.True(boundBird.IsBig);
+            Assert.Equal("Fred", boundBird.Name);
+        }
+        
+        // copied from http://stackoverflow.com/questions/1879395/how-to-generate-a-stream-from-a-string
+        private Stream GenerateStreamFromString(string s)
+        {
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
+        
+    }
+    
+    public class Bird
+    {
+        public string Name {get; set;}
+        
+        public bool IsBig {get; set;}
     }
    
 }
